@@ -1,0 +1,212 @@
+/*
+ * see license.txt
+ */
+package lita.vm;
+
+/**
+ * Operation Code definitions.  
+ * 
+ * @author Tony
+ *
+ */
+public class Opcodes {
+
+    private static final class Opcode {
+        String opcode;
+        int numberOfArgs;
+        
+        Opcode(String opcode, int numberOfArgs) {
+            this.opcode = opcode;
+            this.numberOfArgs = numberOfArgs;
+        }
+    }
+    
+    /**
+     * Operation Codes
+     * 
+     * All examples use $a and $b as representing argument 1 and argument 2.
+     * 
+     */
+    public static final int
+        NOOP        = 0,
+        
+        MOVI        = 1,   // Moves the int value to the first register MOVI $a $b ($a = $b)
+        MOVF        = 2,   // Moves the float value to the first register MOVF $a $b ($a = $b)
+        MOVB        = 3,   // Moves the byte value to the first register MOVB $a $b ($a = $b)
+        
+        LDCI        = 4,   // Loads a int constant into a register LDCI $a
+        LDCF        = 5,   // Loads a float constant into a register LDCF $a
+        LDCB        = 7,   // Loads a byte of constant into a register LDCB $a
+        LDCA        = 8,   // Loads the address of the constant into a register LDCA $a
+        
+        PUSHI       = 9,   // PUSH's the register value onto the stack PUSHI $a
+        PUSHF       = 10,  // PUSH's the register value onto the stack PUSHF $a
+        PUSHB       = 11,  // PUSH's the register value onto the stack PUSHB $a
+        
+        POPI        = 12,  // POP's the top of the stack into the register POPI $a
+        POPF        = 13,  // POP's the top of the stack into the register POPF $a
+        POPB        = 14,  // POP's the top of the stack into the register POPB $a
+        
+        IFI         = 15,  // If (integer) $a > $b skips the next instruction; IFI $a $b
+        IFF         = 16,  // If (float)   $a > $b skips the next instruction; IFF $a $b
+        IFB         = 17,  // If (byte)    $a > $b skips the next instruction; IFB $a $b
+        
+        JMP         = 18,  // Jumps the amount of $b
+        
+        PRINTI      = 19,  // Prints registers
+        PRINTF      = 20,  // Prints registers
+        PRINTB      = 21,  // Prints the byte at the supplied address
+        
+        CALL        = 22,  // CALL $b  pushes the address on the next instruction onto the stack
+        RET         = 23,  // stores return value in $x registers and moves the PC to the the value on the top of the stack 
+        
+        
+        ADDI        = 30,   // Adds two integers ADDI $a $b => $a = $a + $b
+        ADDF        = 31,   // Adds two floats ADDF $a $b => $a = $a + $b
+        ADDB        = 32,   // Adds two bytes ADDB $a $b => $a = $a + $b
+        
+        SUBI        = 33,   // Subtracts two integers SUBI $a $b => $a = $a - $b
+        SUBF        = 34,   // Subtracts two floats SUBF $a $b => $a = $a - $b
+        SUBB        = 35,   // Subtracts two bytes SUBB $a $b => $a = $a - $b
+        
+        MULI        = 36,   // Multiplies two integers MULI $a $b => $a = $a * $b
+        MULF        = 37,   // Multiplies two floats MULF $a $b => $a = $a * $b
+        MULB        = 38,   // Multiplies two bytes MULB $a $b => $a = $a * $b
+        
+        DIVI        = 39,   // Divides two integers DIVI $a $b => $a = $a / $b
+        DIVF        = 40,   // Divides two floats DIVF $a $b => $a = $a / $b
+        DIVB        = 41,   // Divides two bytes DIVB $a $b => $a = $a / $b
+        
+        MODI        = 42,   // Remainder of two integers MODI $a $b => $a = $a % $b
+        MODF        = 43,   // Remainder of two floats MODI $a $b => $a = $a % $b
+        MODB        = 44,   // Remainder of two bytes MODI $a $b => $a = $a % $b
+        
+        ORI         = 45,   // Bitwise OR of two integers ORI $a $b => $a = $a | $b
+        ORB         = 46,   // Bitwise OR of two bytes ORB $a $b => $a = $a | $b
+        
+        ANDI        = 47,   // Bitwise AND of two integers ANDI $a $b => $a = $a & $b
+        ANDB        = 48,   // Bitwise AND of two bytes ANDB $a $b => $a = $a & $b
+        
+        NOTI        = 49,   // Bitwise NOT of the integer NOTI $a $b => $a = ~$b
+        NOTB        = 50,   // Bitwise NOT of the byte NOTB $a $b => $a = ~$b
+        
+        XORI        = 51,   // Bitwise exclusive OR of the integers XORI $a $b => $a = $a ^ $b
+        XORB        = 52,   // Bitwise exclusive OR of the bytes XORI $a $b => $a = $a ^ $b
+        
+        SZRLI        = 53,  // Bitwise shift zero right logical operator for integer SZRLI $a $b => $a >>> $b
+        SZRLB        = 54,  // Bitwise shift zero right logical operator for byte SZRLB $a $b => $a >>> $b
+        
+        SRLI         = 55,  // Bitwise shift right logical operator for integer SRLI $a $b => $a >> $b
+        SRLB         = 56,  // Bitwise shift right logical operator for byte SRLB $a $b => $a >> $b
+        
+        SLLI         = 57,  // Bitwise shift left logical operator for integer SLLI $a $b => $a << $b
+        SLLB         = 58   // Bitwise shift left logical operator for byte SLLB $a $b => $a << $b
+        ;
+    
+    private static final Opcode[] opcodesStr = new Opcode[64];
+    static {
+        opcodesStr[NOOP] = new Opcode("NOOP", 0);
+        
+        opcodesStr[MOVI] = new Opcode("MOVI", 2);
+        opcodesStr[MOVF] = new Opcode("MOVF", 2);
+        opcodesStr[MOVB] = new Opcode("MOVB", 2);
+        
+        opcodesStr[LDCI] = new Opcode("LDCI", 2);
+        opcodesStr[LDCF] = new Opcode("LDCF", 2);
+        opcodesStr[LDCB] = new Opcode("LDCB", 2);
+        opcodesStr[LDCA] = new Opcode("LDCA", 2);
+        
+        opcodesStr[PUSHI] = new Opcode("PUSHI", 1);
+        opcodesStr[PUSHF] = new Opcode("PUSHF", 1);
+        opcodesStr[PUSHB] = new Opcode("PUSHB", 1);
+        
+        opcodesStr[POPI] = new Opcode("POPI", 1);
+        opcodesStr[POPF] = new Opcode("POPF", 1);
+        opcodesStr[POPB] = new Opcode("POPB", 1);
+        
+        opcodesStr[IFI] = new Opcode("IFI", 2);
+        opcodesStr[IFF] = new Opcode("IFF", 2);
+        opcodesStr[IFB] = new Opcode("IFB", 2);
+        
+        opcodesStr[JMP] = new Opcode("JMP", 1);
+        
+        opcodesStr[PRINTI] = new Opcode("PRINTI", 1);
+        opcodesStr[PRINTF] = new Opcode("PRINTF", 1);
+        opcodesStr[PRINTB] = new Opcode("PRINTB", 1);
+        
+        opcodesStr[CALL] = new Opcode("CALL", 1);
+        opcodesStr[RET]  = new Opcode("RET", 0);
+        
+        
+        
+        opcodesStr[ADDI] = new Opcode("ADDI", 2);
+        opcodesStr[ADDF] = new Opcode("ADDF", 2);
+        opcodesStr[ADDB] = new Opcode("ADDB", 2);
+        
+        opcodesStr[SUBI] = new Opcode("SUBI", 2);
+        opcodesStr[SUBF] = new Opcode("SUBF", 2);
+        opcodesStr[SUBB] = new Opcode("SUBB", 2);
+        
+        opcodesStr[MULI] = new Opcode("MULI", 2);
+        opcodesStr[MULF] = new Opcode("MULF", 2);
+        opcodesStr[MULB] = new Opcode("MULB", 2);
+        
+        opcodesStr[DIVI] = new Opcode("DIVI", 2);
+        opcodesStr[DIVF] = new Opcode("DIVF", 2);
+        opcodesStr[DIVB] = new Opcode("DIVB", 2);
+        
+        opcodesStr[MODI] = new Opcode("MODI", 2);
+        opcodesStr[MODF] = new Opcode("MODF", 2);
+        opcodesStr[MODB] = new Opcode("MODB", 2);
+        
+        opcodesStr[ORI] = new Opcode("ORI", 2);
+        opcodesStr[ORB] = new Opcode("ORB", 2);
+        
+        opcodesStr[ANDI] = new Opcode("ANDI", 2);
+        opcodesStr[ANDB] = new Opcode("ANDB", 2);
+        
+        opcodesStr[NOTI] = new Opcode("NOTI", 2);
+        opcodesStr[NOTB] = new Opcode("NOTB", 2);
+        
+        opcodesStr[XORI] = new Opcode("XORI", 2);
+        opcodesStr[XORB] = new Opcode("XORB", 2);
+        
+        opcodesStr[SZRLI] = new Opcode("SZRLI", 2);
+        opcodesStr[SZRLB] = new Opcode("SZRLB", 2);
+        
+        opcodesStr[SRLI] = new Opcode("SRLI", 2);
+        opcodesStr[SRLB] = new Opcode("SRLB", 2);
+        
+        opcodesStr[SLLI] = new Opcode("SLLI", 2);
+        opcodesStr[SLLB] = new Opcode("SLLB", 2);
+    }
+    
+    public static String opcodeStr(int opcode) {
+        return opcodesStr[opcode].opcode;
+    }
+    
+    /**
+     * String to opcode conversion
+     * 
+     * @param opcode
+     * @return returns the raw opcode number (not in instruction format bit offset)
+     */
+    public static int strOpcode(String opcode) {
+        for(int i = 0; i < opcodesStr.length; i++) {
+            if(opcodesStr[i] != null && opcodesStr[i].opcode.equalsIgnoreCase(opcode)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
+    /**
+     * The number of arguments the supplied opcode takes
+     * 
+     * @param opcode - in raw opcode number format (i.e., not in instruction format bit offset)
+     * @return the number of arguments the opcode takes
+     */
+    public static int numberOfArgs(int opcode) {
+        return opcodesStr[opcode].numberOfArgs;
+    }
+}
