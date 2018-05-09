@@ -1,3 +1,12 @@
+LitaVM
+==
+LitaVM is a 32 bit CPU Virtual Machine, created because who doesn't like understanding how low level hardware works?  The name `lita` comes from my grandma who I love dearly.
+
+The main goals of this project is to create a CPU with a set of instructions to manipulate memory and create an assembly language to program the fancy CPU.  If I feel adventorous enough, I may create a C like language for it as well.
+
+I'm not sure where this project will end up, but I'll continue to churn on it until it becomes a chore.  
+
+Enough introduction, let's get to the meat.
 
 Bytecode Instruction Format 
 ===
@@ -35,3 +44,12 @@ Instruction Format Table
 | op  | op  | op  | op  | op  | op  | Adr | v1  | v1  | v1  | v1  | Reg | Adr | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | 
 | op  | op  | op  | op  | op  | op  | Adr | v1  | v1  | v1  | v1  | 0   | Imm | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  |
 | jmp | jmp | jmp | jmp | jmp | jmp | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   |
+
+Operation Codes
+==
+The there are a number of `opcodes` the CPU can handle.
+
+| Opcode Name  | Value | Arguments | Notes                     |
+|--------------|:-----:|:---------:|:-------------------------:|
+| NOOP         | 0     | 0         | No operation, does nothing|
+
