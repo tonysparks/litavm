@@ -10,16 +10,16 @@ Enough introduction, let's get to the meat.
 
 Bytecode Instruction Format 
 ===
-Each instruction consists of a 32 bit integer.  There are two primary formats, one for `JMP` opcode and another for the rest of the opcodes.  
+Each instruction consists of a 32 bit integer.  There are two primary formats, one for `JMP` and `CALL` opcodes and another for the rest of the opcodes.  
 
 The first 6 bits are to always used to identify the `opcode` to execute.  
 
-JMP Instruction Format
+JMP/CALL Instruction Format
 ==
-The `JMP` instruction has its own special format as it needs the ability to have a large number to support the ability to jump anywhere in the code.  As such, no
-program can have more than `2^24` (`16,777,216`) instructions and be able to fully support `JMP` operations.
+The `JMP` and `CALL` instructions have their own special format as they need the ability to have a large number to support the ability to jump anywhere in the code.  As such, no
+program can have more than `2^24` (`16,777,216`) instructions and be able to fully support `JMP` and `CALL` operations.
 
-The remaining 24 bits for the `JMP` instruction is an immediate mode unsigned number.  This number represents where in the program to jump to, it is a zero based 
+The remaining 24 bits for the `JMP` and `CALL` instructions is an immediate mode unsigned number.  This number represents where in the program to jump to, it is a zero based 
 absolute index.   
 
 Remaining Instructions Format
@@ -44,6 +44,20 @@ Instruction Format Table
 | op  | op  | op  | op  | op  | op  | Adr | v1  | v1  | v1  | v1  | Reg | Adr | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | 
 | op  | op  | op  | op  | op  | op  | Adr | v1  | v1  | v1  | v1  | 0   | Imm | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  |
 | jmp | jmp | jmp | jmp | jmp | jmp | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   | v   |
+
+Registers
+==
+There are 9 total registers, three reserved and six general purpose.  Registers can contain a 32 bit value (either int or float); use the appropriate `opcode` to interpret the value of the register correctly (`opcodes` come in three flavors `I`, 'F`, `B` to parse 32 bit int, 32 bit float and 8 bit bytes respectively.  Additionally, the register can contain a memory address, as all memory addresses are 32 bit.
+
+* `$sp` is the stack pointer and is available for read/write
+* `$pc` is the program counter and is available for read
+* `$r` stores the return address when invoking a `CALL` instruction; this is available for read/write
+* `$a` is a general purpose register for read/write
+* `$b` is a general purpose register for read/write
+* `$c` is a general purpose register for read/write
+* `$i` is a general purpose register for read/write
+* `$j` is a general purpose register for read/write
+* `$k` is a general purpose register for read/write
 
 Operation Codes
 ==
