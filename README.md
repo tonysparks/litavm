@@ -88,4 +88,32 @@ There are a number of `opcodes` the CPU can handle.
 | PRINTB       | 20    | $a        | Prints the value of $a to system out |
 | CALL         | 21    | $v        | Stores the current program counter in register `$r` and sets the program counter to $v |
 | RET          | 22    | 0         | Sets the program counter to the value stored in register `$r` |
-
+| ADDI         | 30    | $a $b     | Adds two 32 bit int and stores the result in $a = $a + $b |
+| ADDF         | 31    | $a $b     | Adds two 32 bit float and stores the result in $a = $a + $b |
+| ADDB         | 32    | $a $b     | Adds two 8 bit byte and stores the result in $a = $a + $b |
+| SUBI         | 33    | $a $b     | Subtracts two 32 bit int and stores the result in $a = $a - $b |
+| SUBF         | 34    | $a $b     | Subtracts two 32 bit float and stores the result in $a = $a - $b |
+| SUBB         | 35    | $a $b     | Subtracts two 8 bit byte and stores the result in $a = $a - $b |
+| MULI         | 36    | $a $b     | Multiplies two 32 bit int and stores the result in $a = $a * $b |
+| MULF         | 37    | $a $b     | Multiples two 32 bit float and stores the result in $a = $a * $b |
+| MULB         | 38    | $a $b     | Multiples two 8 bit byte and stores the result in $a = $a * $b |
+| DIVI         | 39    | $a $b     | Divides two 32 bit int and stores the result in $a = $a / $b |
+| DIVF         | 40    | $a $b     | Divides two 32 bit float and stores the result in $a = $a / $b |
+| DIVB         | 41    | $a $b     | Divides two 8 bit byte and stores the result in $a = $a / $b |
+| MODI         | 42    | $a $b     | Remainder of dividing two 32 bit int and stores the result in $a = $a % $b |
+| MODF         | 43    | $a $b     | Remainder of dividing two 32 bit float and stores the result in $a = $a % $b |
+| MODB         | 44    | $a $b     | Remainder of dividing two 8 bit byte and stores the result in $a = $a % $b |
+| ORI          | 45    | $a $b     | Bitwise OR of two 32 bit int and stores the result in $a = $a | $b |
+| ORB          | 46    | $a $b     | Bitwise OR of two 8 bit byte and stores the result in $a = $a | $b |
+| ANDI         | 47    | $a $b     | Bitwise AND of two 32 bit int and stores the result in $a = $a & $b |
+| ANDB         | 48    | $a $b     | Bitwise AND of two 8 bit byte and stores the result in $a = $a & $b |
+| NOTI         | 49    | $a $b     | Bitwise NOT of a 32 bit int and stores the result in $a = ~$b |
+| NOTB         | 50    | $a $b     | Bitwise NOT of a 8 bit byte and stores the result in $a = ~$b |
+| XORI         | 51    | $a $b     | Bitwise Exclusive OR of two 32 bit int and stores the result in $a = $a ^ $b |
+| XORB         | 52    | $a $b     | Bitwise Exclusive OR of two 8 bit byte and stores the result in $a = $a ^ $b |
+| SZRLI        | 53    | $a $b     | Bitwise Shift Zero Right Logical of a 32 bit int and stores the result in $a = $a >>> $b |
+| SZRLB        | 54    | $a $b     | Bitwise Shift Zero Right Logical of a 8 bit byte and stores the result in $a = $a >>> $b |
+| SRLI         | 55    | $a $b     | Bitwise Shift Right Logical of a 32 bit int and stores the result in $a = $a >> $b |
+| SRLB         | 56    | $a $b     | Bitwise Shift Right Logical of a 8 bit byte and stores the result in $a = $a >> $b |
+| SLLI         | 57    | $a $b     | Bitwise Shift Left Logical of a 32 bit int and stores the result in $a = $a << $b |
+| SLLB         | 58    | $a $b     | Bitwise Shift Left Logical of a 8 bit byte and stores the result in $a = $a << $b |
