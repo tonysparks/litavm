@@ -10,7 +10,7 @@ Enough introduction, let's get to the meat.
 
 Bytecode Instruction Format 
 ===
-Each instruction consists of a 32 bit integer.  There are two primary formats, one for `JMP` and `CALL` opcodes and another for the rest of the opcodes.  
+Each instruction consists of a 32 bit integer.  There are two primary formats, one for `JMP`/`CALL` opcodes and another for the rest of the opcodes.  
 
 The first 6 bits are to always used to identify the `opcode` to execute.  
 
