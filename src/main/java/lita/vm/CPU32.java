@@ -58,7 +58,7 @@ public class CPU32 {
             // JMP instruction is special in that its argument is
             // a 24 bit immediate mode number
             ////            
-            if(opcode==JMP) {
+            if(opcode==JMP||opcode==CALL) {
                 arg2Value = argJmpValue(instr); 
             }
             else {
@@ -376,7 +376,7 @@ public class CPU32 {
                 }
                 case CALL: {
                     this.r.address(pc);                    
-                    int value = this.currentInstruction.getArg2IntValue();
+                    int value = this.currentInstruction.arg2Value;
                     
                     pc = value; 
                     break;

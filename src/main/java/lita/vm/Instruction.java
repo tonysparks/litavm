@@ -33,7 +33,7 @@ package lita.vm;
  * 
  * ravvvvvvvvvvvvvvvvvvv
  * 
- * The only exception to the above format is the JMP instruction, which takes on the format of:
+ * The only exception to the above format is the JMP and CALL instructions, which takes on the format of:
  * 
  * ooooooiiiiiiiiiiiiiiiiiiiiiiiiii
  * 
@@ -121,7 +121,7 @@ public class Instruction {
         int opcode = opcode(instruction);
         sb.append(Opcodes.opcodeStr(opcode)).append(" ");
         
-        if(opcode == Opcodes.JMP) {
+        if(opcode == Opcodes.JMP || opcode == Opcodes.CALL) {
             sb.append("#").append(argJmpValue(instruction));
         }
         else {

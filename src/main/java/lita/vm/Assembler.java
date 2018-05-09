@@ -90,7 +90,7 @@ public class Assembler {
         else {
             int opcode = this.parser.parseOpcode(args.get(0));
             int indexedOpcode = Instruction.opcode(opcode);
-            if(Opcodes.JMP == indexedOpcode) {
+            if(Opcodes.JMP == indexedOpcode || Opcodes.CALL == indexedOpcode) {
                 addInstruction(opcode, 0, this.parser.parseJumpArg(args.get(1)));
             }
             else {
@@ -154,7 +154,7 @@ public class Assembler {
             int parg1 = 0, 
                 parg2 = 0;
             
-            if(Opcodes.JMP == indexedOpcode) {
+            if(Opcodes.JMP == indexedOpcode || Opcodes.CALL == indexedOpcode) {
                 parg2 = this.parser.parseJumpArg(arg1);                
             }
             else {

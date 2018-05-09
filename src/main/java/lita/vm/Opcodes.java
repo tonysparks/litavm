@@ -36,29 +36,29 @@ public class Opcodes {
         
         LDCI        = 4,   // Loads a int constant into a register LDCI $a
         LDCF        = 5,   // Loads a float constant into a register LDCF $a
-        LDCB        = 7,   // Loads a byte of constant into a register LDCB $a
-        LDCA        = 8,   // Loads the address of the constant into a register LDCA $a
+        LDCB        = 6,   // Loads a byte of constant into a register LDCB $a
+        LDCA        = 7,   // Loads the address of the constant into a register LDCA $a
         
-        PUSHI       = 9,   // PUSH's the register value onto the stack PUSHI $a
-        PUSHF       = 10,  // PUSH's the register value onto the stack PUSHF $a
-        PUSHB       = 11,  // PUSH's the register value onto the stack PUSHB $a
+        PUSHI       = 8,   // PUSH's the register value onto the stack PUSHI $a
+        PUSHF       = 9,  // PUSH's the register value onto the stack PUSHF $a
+        PUSHB       = 10,  // PUSH's the register value onto the stack PUSHB $a
         
-        POPI        = 12,  // POP's the top of the stack into the register POPI $a
-        POPF        = 13,  // POP's the top of the stack into the register POPF $a
-        POPB        = 14,  // POP's the top of the stack into the register POPB $a
+        POPI        = 11,  // POP's the top of the stack into the register POPI $a
+        POPF        = 12,  // POP's the top of the stack into the register POPF $a
+        POPB        = 13,  // POP's the top of the stack into the register POPB $a
         
-        IFI         = 15,  // If (integer) $a > $b skips the next instruction; IFI $a $b
-        IFF         = 16,  // If (float)   $a > $b skips the next instruction; IFF $a $b
-        IFB         = 17,  // If (byte)    $a > $b skips the next instruction; IFB $a $b
+        IFI         = 14,  // If (integer) $a > $b skips the next instruction; IFI $a $b
+        IFF         = 15,  // If (float)   $a > $b skips the next instruction; IFF $a $b
+        IFB         = 16,  // If (byte)    $a > $b skips the next instruction; IFB $a $b
         
-        JMP         = 18,  // Jumps the amount of $b
+        JMP         = 17,  // Jumps the amount of $b
         
-        PRINTI      = 19,  // Prints registers
-        PRINTF      = 20,  // Prints registers
-        PRINTB      = 21,  // Prints the byte at the supplied address
+        PRINTI      = 18,  // Prints registers
+        PRINTF      = 19,  // Prints registers
+        PRINTB      = 20,  // Prints the byte at the supplied address
         
-        CALL        = 22,  // CALL $b  pushes the address on the next instruction onto the stack
-        RET         = 23,  // stores return value in $x registers and moves the PC to the the value on the top of the stack 
+        CALL        = 21,  // CALL $b  pushes the address on the next instruction onto the stack
+        RET         = 22,  // stores return value in $x registers and moves the PC to the the value on the top of the stack 
         
         
         ADDI        = 30,   // Adds two integers ADDI $a $b => $a = $a + $b
