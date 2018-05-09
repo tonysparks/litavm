@@ -47,7 +47,7 @@ Instruction Format Table
 
 Registers
 ==
-There are 9 total registers, three reserved and six general purpose.  Registers can contain a 32 bit value (either int or float); use the appropriate `opcode` to interpret the value of the register correctly (`opcodes` come in three flavors `I`, 'F`, `B` to parse 32 bit int, 32 bit float and 8 bit bytes respectively.  Additionally, the register can contain a memory address, as all memory addresses are 32 bit.
+There are 9 total registers, three reserved and six general purpose.  Registers can contain a 32 bit value (either int or float); use the appropriate `opcode` to interpret the value of the register correctly (`opcodes` come in three flavors `I`, `F`, `B` to parse 32 bit int, 32 bit float and 8 bit bytes respectively.  Additionally, a register can contain a memory address, as all memory addresses are 32 bit.
 
 * `$sp` is the stack pointer and is available for read/write
 * `$pc` is the program counter and is available for read
