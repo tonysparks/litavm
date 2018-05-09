@@ -2,7 +2,7 @@ LitaVM
 ==
 LitaVM is a 32 bit CPU Virtual Machine, created because who doesn't like understanding how low level hardware works?  The name `lita` comes from my grandma who I love dearly.
 
-The main goals of this project is to create a CPU with a set of instructions to manipulate memory and create an assembly language to program the fancy CPU.  If I feel adventorous enough, I may create a C like language for it as well.
+The main goals of this project is to create a CPU with a set of instructions to manipulate memory and create an assembly language to program the fancy CPU.  If I feel adventurous enough, I may create a C like language for it as well.
 
 I'm not sure where this project will end up, but I'll continue to churn on it until it becomes a chore.  
 
@@ -47,9 +47,31 @@ Instruction Format Table
 
 Operation Codes
 ==
-The there are a number of `opcodes` the CPU can handle.
+There are a number of `opcodes` the CPU can handle.
 
 | Opcode Name  | Value | Arguments | Notes                     |
 |--------------|:-----:|:---------:|:-------------------------:|
 | NOOP         | 0     | 0         | No operation, does nothing|
+| MOVI         | 1     | $a $b     | Moves 32 bit int $a = $b  |
+| MOVF         | 2     | $a $b     | Moves 32 bit float $a = $b |
+| MOVB         | 3     | $a $b     | Moves 8 bit byte $a = $b  |
+| LDCI         | 4     | $a $b     | Loads 32 bit int constant $a = $b |
+| LDCF         | 5     | $a $b     | Loads 32 bit float constant $a = $b |
+| LDCB         | 6     | $a $b     | Loads 8 bit byte constant $a = $b |
+| LDCA         | 7     | $a $b     | Loads 32 bit int constant address $a = $b |
+| PUSHI        | 8     | $b        | Push 32 bit int on top of stack (increments $sp by 4) |
+| PUSHF        | 9     | $b        | Push 32 bit float on top of stack (increments $sp by 4) |
+| PUSHB        | 10    | $b        | Push 8 bit byte on top of stack (increments $sp by 1) |
+| POPI         | 11    | $a        | Pops 32 bit int from top of stack (decrements $sp by 4) |
+| POPF         | 12    | $a        | Pops 32 bit float from top of stack (decrements $sp by 4) |
+| POPB         | 13    | $a        | Pops 8 bit byte from top of stack (decrements $sp by 1) |
+| IFI          | 14    | $a $b     | Skips the next instruction if $a > $b |
+| IFF          | 15    | $a $b     | Skips the next instruction if $a > $b |
+| IFB          | 16    | $a $b     | Skips the next instruction if $a > $b |
+| JMP          | 17    | $v        | Moves the program counter to position $v |
+| PRINTI       | 18    | $a        | Prints the value of $a to system out |
+| PRINTF       | 19    | $a        | Prints the value of $a to system out |
+| PRINTB       | 20    | $a        | Prints the value of $a to system out |
+| CALL         | 21    | $v        | Stores the current program counter in register `$r` and sets the program counter to $v |
+| RET          | 22    | 0         | Sets the program counter to the value stored in register `$r` |
 
