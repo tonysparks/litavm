@@ -129,7 +129,7 @@ Prints out each ASCII value of a the string
 .text "Hello World"
 
 
-ldca $a 0            ;; Load the constant address in $a
+ldca $a .text        ;; Load the constant address in $a
 pushi $a             ;; push the address on the stack, so that print_string can use it
 call :print_string   ;; call the print_string subroutine
 
