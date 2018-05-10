@@ -363,15 +363,15 @@ public class CPU32 {
                 }
                     
                 case PRINTI: {
-                    System.out.println(this.currentInstruction.x.intValue());
+                    System.out.println(this.currentInstruction.getArg2IntValue());
                     break;
                 }
                 case PRINTF: {
-                    System.out.println(this.currentInstruction.x.floatValue());
+                    System.out.println(this.currentInstruction.getArg2FloatValue());
                     break;
                 }
                 case PRINTB: {
-                    System.out.println(getByteValueAt(this.currentInstruction.x));
+                    System.out.println(this.currentInstruction.getArg2ByteValue());
                     break;
                 }
                 case CALL: {
