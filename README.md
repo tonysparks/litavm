@@ -26,11 +26,11 @@ Remaining Instructions Format
 ==
 For all other instructions, they use the remaining 24 bits for two arguments.  The first argument takes 5 bits, were the first bit designates if the value in 
 the register should be treated as an `address` or `value`.  The remaining 4 bits identify which register.  Although, the format supports up to 16 registers, the CPU 
-only has 9 registers.
+only has 10 registers.
   
 The second argument takes 21 bits.  The first bit designates if the argument is a register.  If its set to `1`, then the second bit designates if the value in
 the register should be treated as an `address` or `value`.  The remaining 19 bits identify which register.  Although, the format supports up to `2^19` registers, the CPU
-only has 9 registers.  
+only has 10 registers.  
 
 If the first bit is `0`,  then the second bit designates if the value should be treated either as
 an immediate value (second bit = 1) or a constant index lookup (second bit = 0).  In the immediate value case, the immediate value is an unsigned value with a max value of
@@ -39,7 +39,7 @@ an immediate value (second bit = 1) or a constant index lookup (second bit = 0).
 Instruction Format Table
 ==
 
-| 0   | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 8   | 9   | 10  | 11  | 12  | 13  | 14  | 15  | 16  | 17  | 18  | 19  | 20  | 21  | 22  | 23  | 24  | 25  | 26  | 27  | 28  | 29  | 30  | 32  |
+| 0   | 1   | 2   | 3   | 4   | 5   | 6   | 7   | 8   | 9   | 10  | 11  | 12  | 13  | 14  | 15  | 16  | 17  | 18  | 19  | 20  | 21  | 22  | 23  | 24  | 25  | 26  | 27  | 28  | 29  | 30  | 31  |
 | --- |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 | op  | op  | op  | op  | op  | op  | Adr | v1  | v1  | v1  | v1  | Reg | Adr | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | 
 | op  | op  | op  | op  | op  | op  | Adr | v1  | v1  | v1  | v1  | 0   | Imm | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  | v2  |
@@ -47,17 +47,29 @@ Instruction Format Table
 
 Registers
 ==
-There are 9 total registers, three reserved and six general purpose.  Registers can contain a 32 bit value (either int or float); use the appropriate `opcode` to interpret the value of the register correctly (`opcodes` come in three flavors `I`, `F`, `B` to parse 32 bit int, 32 bit float and 8 bit bytes respectively.  Additionally, a register can contain a memory address, as all memory addresses are 32 bit.
+There are 10 total registers, four reserved and six general purpose.  Registers can contain a 32 bit value (either int or float); use the appropriate `opcode` to interpret the value of the register correctly (`opcodes` come in three flavors `I`, `F`, `B` to parse 32 bit int, 32 bit float and 8 bit bytes respectively.  Additionally, a register can contain a memory address, as all memory addresses are 32 bit.
 
 * `$sp` is the stack pointer and is available for read/write
 * `$pc` is the program counter and is available for read
 * `$r` stores the return address when invoking a `CALL` instruction; this is available for read/write
+* `$h` is the heap pointer that is the address of where heap allocations can begin
 * `$a` is a general purpose register for read/write
 * `$b` is a general purpose register for read/write
 * `$c` is a general purpose register for read/write
 * `$i` is a general purpose register for read/write
 * `$j` is a general purpose register for read/write
 * `$k` is a general purpose register for read/write
+
+RAM
+==
+When instantiating the vm (or thru command line arguments) you may specify the amount of RAM that the VM has available.  By default, there is `1 MiB`.  The memory layout consists of:
+
+| Address | Memory type | Notes |
+|--------:|------------:|:------|
+| 0..x    | Constant Pool | The constant pool stores all string's and number constants |
+| x..MaxRam-MaxStackSize | Heap | The heap grows upward, meaning as more memory is allocated to the heap, the memory addresses increase |
+| MaxStackSize..MaxRam | Stack | The stack grows downward, meaning as you push things on the stack, the memory addresses decrease |
+
 
 Operation Codes
 ==
