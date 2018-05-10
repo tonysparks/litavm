@@ -117,3 +117,45 @@ There are a number of `opcodes` the CPU can handle.
 | SRLB         | 56    | $a $b     | Bitwise Shift Right Logical of a 8 bit byte and stores the result in $a = $a >> $b |
 | SLLI         | 57    | $a $b     | Bitwise Shift Left Logical of a 32 bit int and stores the result in $a = $a << $b |
 | SLLB         | 58    | $a $b     | Bitwise Shift Left Logical of a 8 bit byte and stores the result in $a = $a << $b |
+
+
+Sample Assembly
+==
+
+Prints out each ASCII value of a the string
+```asm
+
+;; Create a constant
+.text "Hello World"
+
+
+ldca $a 0            ;; Load the constant address in $a
+pushi $a             ;; push the address on the stack, so that print_string can use it
+call :print_string   ;; call the print_string subroutine
+
+jmp :exit            ; exit out of the program
+printi #11           ; shouldn't get invoked!
+
+;;
+;; Prints a string
+;;
+;; input:
+;;    $sp <address> to string constant
+;; output:
+;;    <void>
+;;
+:print_string        
+        popi $a $sp    ;; stores the address of the string constant
+    :print_loop
+        ifb &$a #0     ;; loops until the value at address $a = 0; strings are null terminated
+        jmp :print_end_loop
+        
+        printb &$a     ;; prints out the ASCII byte character
+        addi $a #1     ;; increments to the next character byte
+        jmp :print_loop
+    :print_end_loop    
+        ret             ;; Stores return $pc in $r register, RET sets the $pc to value of $r
+
+
+:exit
+```
