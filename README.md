@@ -94,12 +94,15 @@ There are a number of `opcodes` the CPU can handle.
 | IFI          | 14    | $a $b     | Skips the next instruction if $a > $b |
 | IFF          | 15    | $a $b     | Skips the next instruction if $a > $b |
 | IFB          | 16    | $a $b     | Skips the next instruction if $a > $b |
-| JMP          | 17    | $v        | Moves the program counter to position $v |
-| PRINTI       | 18    | $a        | Prints the value of $a to system out |
-| PRINTF       | 19    | $a        | Prints the value of $a to system out |
-| PRINTB       | 20    | $a        | Prints the value of $a to system out |
-| CALL         | 21    | $v        | Stores the current program counter in register `$r` and sets the program counter to $v |
-| RET          | 22    | 0         | Sets the program counter to the value stored in register `$r` |
+| IFEI         | 17    | $a $b     | Skips the next instruction if $a >= $b |
+| IFEF         | 18    | $a $b     | Skips the next instruction if $a >= $b |
+| IFEB         | 19    | $a $b     | Skips the next instruction if $a >= $b |
+| JMP          | 20    | $v        | Moves the program counter to position $v |
+| PRINTI       | 21    | $a        | Prints the value of $a to system out |
+| PRINTF       | 22    | $a        | Prints the value of $a to system out |
+| PRINTB       | 23    | $a        | Prints the value of $a to system out |
+| CALL         | 24    | $v        | Stores the current program counter in register `$r` and sets the program counter to $v |
+| RET          | 25    | 0         | Sets the program counter to the value stored in register `$r` |
 | ADDI         | 30    | $a $b     | Adds two 32 bit int and stores the result in $a = $a + $b |
 | ADDF         | 31    | $a $b     | Adds two 32 bit float and stores the result in $a = $a + $b |
 | ADDB         | 32    | $a $b     | Adds two 8 bit byte and stores the result in $a = $a + $b |
