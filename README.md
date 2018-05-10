@@ -137,15 +137,15 @@ jmp :exit            ; exit out of the program
 printi #11           ; shouldn't get invoked!
 
 ;;
-;; Prints a string
+;; Prints the ASCII values of the string
 ;;
 ;; input:
-;;    $sp <address> to string constant
+;;    <address> to string constant, retreived from top of the stack
 ;; output:
 ;;    <void>
 ;;
 :print_string        
-        popi $a $sp    ;; stores the address of the string constant
+        popi $a        ;; stores the address of the string constant
     :print_loop
         ifb &$a #0     ;; loops until the value at address $a = 0; strings are null terminated
         jmp :print_end_loop
