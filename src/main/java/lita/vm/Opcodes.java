@@ -51,14 +51,18 @@ public class Opcodes {
         IFF         = 15,  // If (float)   $a > $b skips the next instruction; IFF $a $b
         IFB         = 16,  // If (byte)    $a > $b skips the next instruction; IFB $a $b
         
-        JMP         = 17,  // Jumps the amount of $b
+        IFEI        = 17,  // If (integer) $a >= $b skips the next instruction; IFEI $a $b
+        IFEF        = 18,  // If (float)   $a >= $b skips the next instruction; IFEF $a $b
+        IFEB        = 19,  // If (byte)    $a >= $b skips the next instruction; IFEB $a $b
         
-        PRINTI      = 18,  // Prints registers
-        PRINTF      = 19,  // Prints registers
-        PRINTB      = 20,  // Prints the byte at the supplied address
+        JMP         = 20,  // Jumps the amount of $b
         
-        CALL        = 21,  // CALL $b  pushes the address on the next instruction onto the stack
-        RET         = 22,  // stores return value in $x registers and moves the PC to the the value on the top of the stack 
+        PRINTI      = 21,  // Prints registers
+        PRINTF      = 22,  // Prints registers
+        PRINTB      = 23,  // Prints the byte at the supplied address
+        
+        CALL        = 24,  // CALL $b  pushes the address on the next instruction onto the stack
+        RET         = 25,  // stores return value in $x registers and moves the PC to the the value on the top of the stack 
         
         
         ADDI        = 30,   // Adds two integers ADDI $a $b => $a = $a + $b
@@ -127,6 +131,10 @@ public class Opcodes {
         opcodesStr[IFI] = new Opcode("IFI", 2);
         opcodesStr[IFF] = new Opcode("IFF", 2);
         opcodesStr[IFB] = new Opcode("IFB", 2);
+        
+        opcodesStr[IFEI] = new Opcode("IFEI", 2);
+        opcodesStr[IFEF] = new Opcode("IFEF", 2);
+        opcodesStr[IFEB] = new Opcode("IFEB", 2);
         
         opcodesStr[JMP] = new Opcode("JMP", 1);
         

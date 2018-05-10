@@ -8,7 +8,8 @@ import static lita.vm.Opcodes.*;
 
 
 /**
- * A 32-bit central processing unit
+ * A 32-bit central processing unit.  The Stack grows down (i.e., starts at highest memory address) and the 
+ * Heap grows up (starts at memory address after constants).
  * 
  * @author Tony
  *
@@ -154,7 +155,7 @@ public class CPU32 {
     }
     
     private final Register[] registers;
-    private final Register sp, pc, r;
+    private final Register sp, pc, r, h;
     
     private final RAM ram;
     
@@ -174,24 +175,29 @@ public class CPU32 {
         this.ram = ram;
         this.stackSize = stackSize;
         
-        this.registers = new Register[9];
+        this.registers = new Register[10];
         this.registers[0] = new Register("$sp", this);
         this.registers[1] = new Register("$pc", this);
         this.registers[2] = new Register("$r", this);
+        this.registers[3] = new Register("$h", this);
         
-        this.registers[3] = new Register("$a", this);
-        this.registers[4] = new Register("$b", this);
-        this.registers[5] = new Register("$c", this);
+        this.registers[4] = new Register("$a", this);
+        this.registers[5] = new Register("$b", this);
+        this.registers[6] = new Register("$c", this);
         
-        this.registers[6] = new Register("$i", this);
-        this.registers[7] = new Register("$j", this);
-        this.registers[8] = new Register("$k", this);
+        this.registers[7] = new Register("$i", this);
+        this.registers[8] = new Register("$j", this);
+        this.registers[9] = new Register("$k", this);
         
         this.sp = this.registers[0];
         this.pc = this.registers[1];
         this.r  = this.registers[2];
+        this.h  = this.registers[3];
         
         this.currentInstruction = new CpuInstruction();
+        
+        // Stack grows down, and the Heap grows up
+        this.sp.address(ram.sizeInBytes() - 1);
     }
 
     /**
@@ -224,6 +230,42 @@ public class CPU32 {
         return this.registers;
     }
     
+    /**
+     * The $h registers holds the starting Heap address.
+     * 
+     * @return the h
+     */
+    public Register getH() {
+        return h;
+    }
+    
+    /**
+     * The $pc registers holds the Program Counter
+     * 
+     * @return the pc
+     */
+    public Register getPc() {
+        return pc;
+    }
+    
+    /**
+     * The $r registers holds the return address from a subroutine call
+     * 
+     * @return the r
+     */
+    public Register getR() {
+        return r;
+    }
+    
+    /**
+     * The $sp registers holds the Stack Pointer 
+     * 
+     * @return the sp
+     */
+    public Register getSp() {
+        return sp;
+    }
+            
     /**
      * An error occurred
      * 
@@ -291,41 +333,41 @@ public class CPU32 {
                 case PUSHI: {
                     int value = this.currentInstruction.getArg2IntValue();
                     
+                    this.sp.decAddress();
                     setIntValue(this.sp, value);
-                    this.sp.incAddress();
                     break;
                 }
                 case PUSHF: {
                     float value = this.currentInstruction.getArg2FloatValue();
                     
+                    this.sp.decAddress();
                     setFloatValue(this.sp, value);
-                    this.sp.incAddress();
                     break;
                 }
                 case PUSHB: {
                     byte value = this.currentInstruction.getArg2ByteValue();
                     
+                    this.sp.addressOffset(-1);
                     setByteValue(this.sp, value);
-                    this.sp.addressOffset(+1);
                     break;
                 }
                 case POPI: {
-                    this.sp.decAddress();
                     int value = getIntValueAt(this.sp);
+                    this.sp.incAddress();
                     
                     this.currentInstruction.x.value(value);                    
                     break;
                 }
                 case POPF: {
-                    this.sp.decAddress();
                     float value = getFloatValueAt(this.sp);
+                    this.sp.incAddress();
                     
                     this.currentInstruction.x.value(value);                    
                     break;
                 }
                 case POPB: {
-                    this.sp.address(-1);
                     byte value = getByteValueAt(this.sp);
+                    this.sp.address(+1);
                     
                     this.currentInstruction.x.value(value);                    
                     break;
@@ -353,6 +395,33 @@ public class CPU32 {
                     byte xValue = this.currentInstruction.getArg1ByteValue();
                     
                     if(xValue > yValue) {
+                        pc++;
+                    }
+                    break;
+                }
+                case IFEI: {
+                    int yValue = this.currentInstruction.getArg2IntValue();          
+                    int xValue = this.currentInstruction.getArg1IntValue();
+                    
+                    if(xValue >= yValue) {
+                        pc++;
+                    }
+                    break;
+                }
+                case IFEF: {
+                    float yValue = this.currentInstruction.getArg2FloatValue();          
+                    float xValue = this.currentInstruction.getArg1FloatValue();
+                    
+                    if(xValue >= yValue) {
+                        pc++;
+                    }
+                    break;
+                }
+                case IFEB: {
+                    byte yValue = this.currentInstruction.getArg2ByteValue();          
+                    byte xValue = this.currentInstruction.getArg1ByteValue();
+                    
+                    if(xValue >= yValue) {
                         pc++;
                     }
                     break;

@@ -16,6 +16,17 @@ import java.util.Map;
  */
 public class AssemblerParser {
 
+    public static class AssemblerInstruction {
+        final public List<String> args;
+        final int lineNumber;
+        
+        
+        AssemblerInstruction(List<String> args, int lineNumber) {
+            this.args = args;
+            this.lineNumber = lineNumber;
+        }
+    }
+    
     private Map<String, Integer> registers;
     private Map<String, Integer> constants;
     
@@ -29,21 +40,21 @@ public class AssemblerParser {
         this.constants = constants;
     }
     
-    private ParserException error(String message) {
-        return new ParserException(message);
+    public ParserException parseError(AssemblerInstruction instruction, String message) {
+        return new ParserException(message + " at line: " + instruction.lineNumber);
     }
     
-    
+
     /**
      * Parses the OPCODE which should be the first argument in the assembly
      * 
      * @param arg0
      * @return the 32bit positioned opcode
      */
-    public int parseOpcode(String arg0) {
+    private int parseOpcode(AssemblerInstruction instr, String arg0) {
         int opcode = Opcodes.strOpcode(arg0);
         if(opcode < 0) {
-            throw error("Invalid opcode: '" + arg0 + "'");
+            throw parseError(instr, "Invalid opcode: '" + arg0 + "'");
         }
         
         return opcode << Instruction.ARG1_SIZE + Instruction.ARG2_SIZE; 
@@ -58,19 +69,22 @@ public class AssemblerParser {
      * @param arg1
      * @return the 32 bit positioned argument one
      */
-    public int parseArg1(String arg1) {
+    private int parseArg1(AssemblerInstruction instr, String arg1) {
         int instruction = 0;
         
         boolean isAddress = arg1.startsWith("&");
         if(isAddress) {
             instruction |= Instruction.ARG1_ADDR_MASK;
             if(arg1.length() < 3) {
-                throw error("Invalid argument structure: '" + arg1 + "'");
+                throw parseError(instr, "Invalid argument structure: '" + arg1 + "'");
             }
             arg1 = arg1.substring(1);
         }
         
-        int registerNumber = registers.get(arg1.toLowerCase());
+        Integer registerNumber = registers.get(arg1.toLowerCase());
+        if(registerNumber == null) {
+            throw parseError(instr, "Invalid register name: '" + arg1 + "'");
+        }
         instruction |= registerNumber;
         
         return instruction << Instruction.ARG2_SIZE;        
@@ -84,9 +98,9 @@ public class AssemblerParser {
      * @param arg
      * @return the instruction
      */
-    public int parseJumpArg(String arg) {
+    private int parseJumpArg(AssemblerInstruction instr, String arg) {
         if(!arg.startsWith("#")) {
-            throw error("Invalid jump instruction argument, must be an immediate number: '" + arg + "'");
+            throw parseError(instr, "Invalid jump instruction argument, must be an immediate number: '" + arg + "'");
         }
         
         arg = arg.substring(1);
@@ -105,7 +119,7 @@ public class AssemblerParser {
      * @param arg2
      * @return the 32 bit positioned argument two
      */
-    public int parseArg2(String arg2) {
+    private int parseArg2(AssemblerInstruction instr, String arg2) {
         int instruction = 0;
         
         boolean isRegister = false;
@@ -114,7 +128,7 @@ public class AssemblerParser {
             isRegister = true;
             instruction |= Instruction.ARG2_ADDR_MASK;
             if(arg2.length() < 3) {
-                throw error("Invalid argument structure: '" + arg2 + "'");
+                throw parseError(instr, "Invalid argument structure: '" + arg2 + "'");
             }
             arg2 = arg2.substring(1);
         }
@@ -122,18 +136,18 @@ public class AssemblerParser {
         Integer registerNumber = registers.get(arg2.toLowerCase());
         if(registerNumber == null) {
             if(isAddress) {
-                throw error("Invalid register argument structure: '" + arg2 + "'");
+                throw parseError(instr, "Invalid register argument structure: '" + arg2 + "'");
             }
 
             if(arg2.startsWith("#")) {
                 if(arg2.length() < 2) {
-                    throw error("Invalid immediate value argument structure: '" + arg2 + "'");    
+                    throw parseError(instr, "Invalid immediate value argument structure: '" + arg2 + "'");    
                 }
                 
                 arg2 = arg2.substring(1);
                 int value = Integer.parseInt(arg2);
                 if(value > Instruction.MAX_IMMEDIATE_VALUE) {
-                    throw error("Invalid immediate value, above max value (" + Instruction.MAX_IMMEDIATE_VALUE + "): '" + value + "'");
+                    throw parseError(instr, "Invalid immediate value, above max value (" + Instruction.MAX_IMMEDIATE_VALUE + "): '" + value + "'");
                 }
                 
                 instruction |= Instruction.ARG2_IMM_MASK;
@@ -142,7 +156,7 @@ public class AssemblerParser {
             else if(arg2.startsWith(".")) {
                 Integer index = this.constants.get(arg2);
                 if(index == null) {
-                    throw error("No constant defined for '" + arg2 + "'");
+                    throw parseError(instr, "No constant defined for '" + arg2 + "'");
                 }
                 
                 instruction |= index;
@@ -167,7 +181,7 @@ public class AssemblerParser {
      * @param line
      * @return the argument list
      */
-    private List<String> parseLine(String line) {
+    private AssemblerInstruction parseLine(int lineNumber, String line) {
         StringBuilder sb = new StringBuilder(line.length());
         
         boolean inComment = false;
@@ -208,8 +222,68 @@ public class AssemblerParser {
         
         args.add(sb.toString());
         
-        return args;
+        return new AssemblerInstruction(args, lineNumber);
         
+    }
+    
+    /**
+     * Parses out the supplied arguments and forms a CPU machine code instruction
+     * 
+     * @param instr - the instruction to parse
+     * @return the machine code instruction
+     */
+    public int parseInstruction(AssemblerInstruction instr) {
+        String arg1 = null;
+        String arg2 = null;
+        
+        switch(instr.args.size()) {
+            case 0:
+            case 1:
+                break;
+            case 2: 
+                arg1 = instr.args.get(1);
+                break;
+            default:
+                arg1 = instr.args.get(1);
+                arg2 = instr.args.get(2);
+                break;
+        }
+        
+        return parseInstruction(instr, arg1, arg2);
+    }
+    
+    /**
+     * Parses out the supplied arguments and forms a CPU machine code instruction
+     * 
+     * @param instr - the instruction to parse
+     * @param arg1 - optional first argument to override
+     * @param arg2 - optional second argument to override
+     * @return the machine code instruction
+     */
+    public int parseInstruction(AssemblerInstruction instr, String arg1, String arg2) {
+        int opcode = parseOpcode(instr, instr.args.get(0));
+        int indexedOpcode = Instruction.opcode(opcode);
+        int parg1 = 0, 
+            parg2 = 0;
+        
+        if(Opcodes.JMP == indexedOpcode || Opcodes.CALL == indexedOpcode) {
+            parg2 = parseJumpArg(instr, arg1);                
+        }
+        else {
+        
+            if(Opcodes.numberOfArgs(Instruction.opcode(opcode)) == 2) {
+                parg1 = parseArg1(instr, arg1);
+                parg2 = 0;
+                if(arg2 != null) {
+                    parg2 = parseArg2(instr, arg2);
+                }    
+            }
+            else if(arg1 != null) {
+                parg2 = parseArg2(instr, arg1);
+            }
+        }
+        
+        return opcode | parg1 | parg2;                  
     }
     
     
@@ -219,15 +293,16 @@ public class AssemblerParser {
      * @param assembly
      * @return the parsed assembly text into instructions with arguments
      */
-    public List<List<String>> parse(String assembly) {
+    public List<AssemblerInstruction> parse(String assembly) {
         // TODO: Account for strings with \n
         List<String> lines = Arrays.asList(assembly.split("\n"));
         
-        List<List<String>> parsedLines = new ArrayList<>();
+        List<AssemblerInstruction> parsedLines = new ArrayList<>();
+        int lineNumber = 1;
         for(String line : lines) {
-            List<String> args = parseLine(line.trim());
-            if(!args.isEmpty()) {
-                parsedLines.add(args);
+            AssemblerInstruction instr = parseLine(lineNumber++, line.trim());
+            if(!instr.args.isEmpty()) {
+                parsedLines.add(instr);
             }
         }
         

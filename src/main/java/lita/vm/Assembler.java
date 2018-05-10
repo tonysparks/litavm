@@ -5,10 +5,10 @@ package lita.vm;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import lita.vm.AssemblerParser.AssemblerInstruction;
 
 /**
  * The Assembler reads in assembly language and compiles it down to machine {@link Bytecode}.
@@ -18,25 +18,12 @@ import java.util.Set;
  */
 public class Assembler {
     
-    private static class ConstantEntry {
-        String constantName;
-        int index;
-        boolean isNumber;
-        
-        ConstantEntry(String constantName, int index, boolean isNumber) {
-            this.constantName = constantName;
-            this.index = index;
-            this.isNumber = isNumber;
-        }
-    }
-    
-
     private List<Integer> instrs;
-    private Set<Number> numPool;
-    private Set<String> strPool;
+    private List<Number> numPool;
+    private List<String> strPool;
     
     private Map<String, Integer> labels;
-    private Map<Integer, List<String>> pendingInstructions;
+    private Map<Integer, AssemblerInstruction> pendingInstructions;
     private Map<String, Integer> constants;
     
     private Map<String, Integer> registers;
@@ -52,8 +39,8 @@ public class Assembler {
         
         this.instrs = new ArrayList<>();
         
-        this.numPool = new HashSet<>();
-        this.strPool = new HashSet<>();
+        this.numPool = new ArrayList<>();
+        this.strPool = new ArrayList<>();
         
         this.constants = new HashMap<>();
         
@@ -77,56 +64,26 @@ public class Assembler {
      * 
      * @param args
      */
-    private void addInstruction(List<String> args) {
+    private void addInstruction(AssemblerInstruction instr) {
         
         // if any of the arguments starts with a label marker,
         // mark this as a pending instruction, so that we can
         // reconcile all of the labels
-        if(args.stream().anyMatch(a -> a.startsWith(":"))) {
+        if(instr.args.stream().anyMatch(a -> a.startsWith(":"))) {
             addInstruction(0);
             
-            this.pendingInstructions.put(this.instrs.size() - 1, args);
+            this.pendingInstructions.put(this.instrs.size() - 1, instr);
         }
-        else {
-            int opcode = this.parser.parseOpcode(args.get(0));
-            int indexedOpcode = Instruction.opcode(opcode);
-            if(Opcodes.JMP == indexedOpcode || Opcodes.CALL == indexedOpcode) {
-                addInstruction(opcode, 0, this.parser.parseJumpArg(args.get(1)));
-            }
-            else {
-                int numberOfArgs = Opcodes.numberOfArgs(indexedOpcode);
-                int arg1 = 0, 
-                    arg2 = 0;
-                
-                switch(numberOfArgs) {
-                    case 0: 
-                        break;
-                    case 1: 
-                        arg2 = this.parser.parseArg2(args.get(1)); 
-                        break;
-                    case 2:
-                        if(args.size() < 3) {
-                            throw new EvalException("Expected 2 opcode arguments: '" + args + "'");
-                        }
-                        
-                        arg1 = this.parser.parseArg1(args.get(1));            
-                        arg2 = this.parser.parseArg2(args.get(2));                    
-                        break;
-                }
-                
-                addInstruction(opcode, arg1, arg2);
-            }
+        else {            
+            int instruction = this.parser.parseInstruction(instr);
+            addInstruction(instruction);
         }
     }
     
     private void addInstruction(int instruction) {
         this.instrs.add(instruction);
     }
-    
-    private void addInstruction(int opcode, int arg1, int arg2) {        
-        addInstruction(opcode | arg1 | arg2);
-    }
-    
+       
     
     /**
      * Reconciles any labels.  This substitutes any instructions
@@ -134,7 +91,8 @@ public class Assembler {
      */
     private void reconcileLabels() {
         this.pendingInstructions.entrySet().forEach( entry -> {
-            List<String> args = entry.getValue();
+            AssemblerInstruction instr = entry.getValue();
+            List<String> args = instr.args;
             String arg1 = args.get(1);
             String arg2 = null;
             if(args.size() > 2) {
@@ -147,57 +105,60 @@ public class Assembler {
             
             if(arg2 != null && arg2.startsWith(":")) {
                 arg2 = "#" + this.labels.get(arg2);                
-            }
+            }            
             
-            int opcode = this.parser.parseOpcode(args.get(0));
-            int indexedOpcode = Instruction.opcode(opcode);
-            int parg1 = 0, 
-                parg2 = 0;
-            
-            if(Opcodes.JMP == indexedOpcode || Opcodes.CALL == indexedOpcode) {
-                parg2 = this.parser.parseJumpArg(arg1);                
-            }
-            else {
-            
-                if(Opcodes.numberOfArgs(Instruction.opcode(opcode)) == 2) {
-                    parg1 = this.parser.parseArg1(arg1);
-                    parg2 = 0;
-                    if(args.size() > 2) {
-                        parg2 = this.parser.parseArg2(arg2);
-                    }    
-                }
-                else {
-                    parg2 = this.parser.parseArg2(arg1);
-                }
-            }
-                        
-            this.instrs.set(entry.getKey(), opcode | parg1 | parg2 );
+            int instruction = this.parser.parseInstruction(instr, arg1, arg2);                        
+            this.instrs.set(entry.getKey(), instruction );
         });
     }
-    
-    private int[] buildConstants(List<List<String>> parsedLines) {
+        
+    private int[] buildConstants(List<AssemblerInstruction> parsedLines) {
+        class ConstantEntry {
+            String constantName;
+            int index;
+            boolean isNumber;
+            
+            ConstantEntry(String constantName, int index, boolean isNumber) {
+                this.constantName = constantName;
+                this.index = index;
+                this.isNumber = isNumber;
+            }
+        }
+        
         List<ConstantEntry> constantEntries = new ArrayList<>();
         
         // Build up the constant pools
-        for(List<String> args: parsedLines) {
+        for(AssemblerInstruction instr: parsedLines) {
+            List<String> args = instr.args;
             if(!args.isEmpty()) {
                 String opcode = args.get(0);
                 if(opcode != null && opcode.startsWith(".")) {
                     if(args.size() < 2) {
-                        throw new EvalException("Illegal constant expression: '" + args + "'");
+                        throw this.parser.parseError(instr, "Illegal constant expression: '" + args + "'");                        
                     }
+                    
+                    int index = 0;
                     
                     String arg = args.get(1);
                     try {
                         
                         Number value = args.contains(".") ? Float.parseFloat(arg) : Integer.parseInt(arg);
-                        numPool.add(value);
+                        index = numPool.indexOf(value);
+                        if(index < 0) {
+                            numPool.add(value);
+                            index = numPool.size();
+                        }
                         
-                        constantEntries.add(new ConstantEntry(opcode, numPool.size(), true));
+                        constantEntries.add(new ConstantEntry(opcode, index, true));
                     }
                     catch(NumberFormatException e) {
-                        strPool.add(arg);
-                        constantEntries.add(new ConstantEntry(opcode, strPool.size(), false));
+                        index = strPool.indexOf(arg);
+                        if(index < 0) {
+                            strPool.add(arg);
+                            index = strPool.size();
+                        }
+                        
+                        constantEntries.add(new ConstantEntry(opcode, index, false));
                     }
                     
                 }
@@ -217,7 +178,7 @@ public class Assembler {
             CPU32 cpu = vm.getCpu();
             RAM ram = vm.getRam();
             
-            int ramAddress = cpu.getStackSize();
+            int ramAddress = 0;
             final int addressInc = cpu.getWordSize() / 8;
             
             int[] constants = new int[numPool.size() + strPool.size()];
@@ -242,6 +203,9 @@ public class Assembler {
                 ramAddress += (str.length() + 1); // strings are null terminated
             }
             
+            // Mark the start of the Heap space
+            cpu.getH().address(ramAddress);
+            
             return constants;        
         }
     }
@@ -265,11 +229,12 @@ public class Assembler {
      * @return the {@link Bytecode}
      */
     public Bytecode compile(String assembly) {        
-        List<List<String>> parsedLines = this.parser.parse(assembly);
+        List<AssemblerInstruction> parsedLines = this.parser.parse(assembly);
         
         final int[] constants = buildConstants(parsedLines);
         
-        for(List<String> args : parsedLines){
+        for(AssemblerInstruction instr : parsedLines) {
+            List<String> args = instr.args;
             String opcode = args.get(0);
             if(opcode != null && !opcode.equals("")) {
                 /* The opcode can be either a Label or Data constant
@@ -287,7 +252,7 @@ public class Assembler {
                 
                 // Actual opcode instruction
                 else {                    
-                    addInstruction(args);
+                    addInstruction(instr);
                 }
             }
         }

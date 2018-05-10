@@ -63,9 +63,25 @@ public class LitaVM {
             LitaVM vm = new LitaVM(ramSize, stackSize, debugMode);
             
             Assembler asm = new Assembler(vm);
-            Bytecode bytecode = asm.compile(new String(Files.readAllBytes(inputFile.toPath()), "UTF8"));
-            
-            vm.execute(bytecode);
+            try {
+                long s = System.nanoTime();
+                Bytecode bytecode = asm.compile(new String(Files.readAllBytes(inputFile.toPath()), "UTF8"));
+                
+                vm.execute(bytecode);
+                System.out.println("Time: " + (System.nanoTime() - s));
+            }
+            catch(ParserException e) {
+                System.err.println("Parsing Error >> " + e.getMessage());
+                if(debugMode) {
+                    throw e;
+                }
+            }
+            catch(EvalException e) {
+                System.err.println("Evaluation Error >> " + e.getMessage());
+                if(debugMode) {
+                    throw e;
+                }
+            }
         }
     }
     
