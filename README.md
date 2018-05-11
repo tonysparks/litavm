@@ -134,6 +134,23 @@ There are a number of `opcodes` the CPU can handle.
 | SLLB         | 58    | $a $b     | Bitwise Shift Left Logical of a 8 bit byte and stores the result in $a = $a << $b |
 
 
+Assembly Language
+==
+The LitaVM assembly language syntax is pretty standard.  
+
+| Assembly Code | Purpose |
+|:--------------|:--------|
+| .favre 4      | Creates a constant named `favre` that can be referenced in instruction arguments, when it is referenced, the number 4 is used|
+| .brett "Brett" | Creates a constant named `brett` that can be referenced in instruction arguments, when it is referenced, the memory address of the start of the `"Brett"` string is used|
+| pushi .favre | This will use the constant `4` and push that onto the stack |
+| pushi #12 | This will use the immediate value of `12` and push that onto the stack. Only integers are allowed in immediate values |
+| ; this is a comment | Creates a comment, anything after the `;` is ignored |
+| :label | Creates a label that a `jmp` or `call` instruction can jump to.  |
+| jmp :label | Moves the program counter to the location of `:label`
+| movi $a $b | The `$a` retrieves the value in the register |
+| ifb &$a $b | The `&` in front of a register means to treat the value in the register as a memory address, and go to that position in memory and return that value|
+
+
 Sample Assembly
 ==
 
