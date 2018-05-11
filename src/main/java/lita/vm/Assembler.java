@@ -142,7 +142,7 @@ public class Assembler {
                     String arg = args.get(1);
                     try {
                         
-                        Number value = args.contains(".") ? Float.parseFloat(arg) : Integer.parseInt(arg);
+                        Number value = arg.contains(".") ? Float.parseFloat(arg) : Integer.parseInt(arg);
                         index = numPool.indexOf(value);
                         if(index < 0) {
                             numPool.add(value);
