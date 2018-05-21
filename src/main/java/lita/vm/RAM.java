@@ -44,7 +44,7 @@ public class RAM {
     @SuppressWarnings("deprecation")
     public void storeStr(int address, String str) {
         str.getBytes(0, str.length(), this.mem, address);
-        this.memWindow.put(str.length(), (byte)'\0');
+        this.memWindow.put(address + str.length(), (byte)'\0');
     }
     
     public void storeBytes(int address, byte[] buf, int offset, int length) {

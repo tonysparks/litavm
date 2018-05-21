@@ -118,6 +118,33 @@ public class CPU32 {
             return isArg1Address ? getByteValueAt(x) : x.byteValue();
         }
         
+        void setArg1IntValue(int value) {
+            if(isArg1Address) {
+                setIntValue(x, value);
+            }
+            else {
+                x.value(value);
+            }
+        }
+        
+        void setArg1FloatValue(float value) {
+            if(isArg1Address) {
+                setFloatValue(x, value);
+            }
+            else {
+                x.value(value);
+            }
+        }
+        
+        void setArg1ByteValue(byte value) {
+            if(isArg1Address) {
+                setByteValue(x, value);
+            }
+            else {
+                x.value(value);
+            }
+        }
+        
         int getArg2IntValue() {
             return isReg ? (isArg2Address ? getIntValueAt(y) : y.intValue()) 
                          : isImmediate ? arg2Value 
@@ -175,7 +202,7 @@ public class CPU32 {
         this.ram = ram;
         this.stackSize = stackSize;
         
-        this.registers = new Register[10];
+        this.registers = new Register[12];
         this.registers[0] = new Register("$sp", this);
         this.registers[1] = new Register("$pc", this);
         this.registers[2] = new Register("$r", this);
@@ -184,10 +211,12 @@ public class CPU32 {
         this.registers[4] = new Register("$a", this);
         this.registers[5] = new Register("$b", this);
         this.registers[6] = new Register("$c", this);
+        this.registers[7] = new Register("$d", this);
         
-        this.registers[7] = new Register("$i", this);
-        this.registers[8] = new Register("$j", this);
-        this.registers[9] = new Register("$k", this);
+        this.registers[8] = new Register("$i", this);
+        this.registers[9] = new Register("$j", this);
+        this.registers[10]= new Register("$k", this);
+        this.registers[11]= new Register("$u", this);
         
         this.sp = this.registers[0];
         this.pc = this.registers[1];
@@ -303,31 +332,31 @@ public class CPU32 {
                     break;
                 }
                 case MOVI: {
-                    this.currentInstruction.x.value(this.currentInstruction.getArg2IntValue());
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getArg2IntValue());
                     break;
                 }
                 case MOVF: {                    
-                    this.currentInstruction.x.value(this.currentInstruction.getArg2FloatValue());
+                    this.currentInstruction.setArg1FloatValue(this.currentInstruction.getArg2FloatValue());
                     break;
                 }
                 case MOVB: {                    
-                    this.currentInstruction.x.value(this.currentInstruction.getArg2ByteValue());
+                    this.currentInstruction.setArg1ByteValue(this.currentInstruction.getArg2ByteValue());
                     break;
                 }
                 case LDCI: {
-                    this.currentInstruction.x.value(this.currentInstruction.getConstantIntValue());                    
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getConstantIntValue());                    
                     break;
                 }
                 case LDCF: {
-                    this.currentInstruction.x.value(this.currentInstruction.getConstantFloatValue());                    
+                    this.currentInstruction.setArg1FloatValue(this.currentInstruction.getConstantFloatValue());                    
                     break;
                 }
                 case LDCB: {
-                    this.currentInstruction.x.value(this.currentInstruction.getConstantByteValue());
+                    this.currentInstruction.setArg1ByteValue(this.currentInstruction.getConstantByteValue());
                     break;
                 }
                 case LDCA: {
-                    this.currentInstruction.x.value(this.currentInstruction.getConstantAddressValue());
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getConstantAddressValue());
                     break;
                 }
                 case PUSHI: {
@@ -355,21 +384,48 @@ public class CPU32 {
                     int value = getIntValueAt(this.sp);
                     this.sp.incAddress();
                     
-                    this.currentInstruction.x.value(value);                    
+                    this.currentInstruction.setArg1IntValue(value);          
                     break;
                 }
                 case POPF: {
                     float value = getFloatValueAt(this.sp);
                     this.sp.incAddress();
                     
-                    this.currentInstruction.x.value(value);                    
+                    this.currentInstruction.setArg1FloatValue(value);           
                     break;
                 }
                 case POPB: {
                     byte value = getByteValueAt(this.sp);
                     this.sp.address(+1);
                     
-                    this.currentInstruction.x.value(value);                    
+                    this.currentInstruction.setArg1ByteValue(value);                    
+                    break;
+                }
+                case DUPI: {
+                    int value = getIntValueAt(this.sp);
+                    this.sp.decAddress();
+                    
+                    setIntValue(this.sp, value);
+                    
+                    this.currentInstruction.setArg1IntValue(value);
+                    break;
+                }
+                case DUPF: {
+                    float value = getFloatValueAt(this.sp);
+                    this.sp.decAddress();
+                    
+                    setFloatValue(this.sp, value);
+                    
+                    this.currentInstruction.setArg1FloatValue(value);
+                    break;
+                }
+                case DUPB: {
+                    byte value = getByteValueAt(this.sp);
+                    this.sp.addressOffset(-1);
+                    
+                    setByteValue(this.sp, value);
+                    
+                    this.currentInstruction.setArg1ByteValue(value);
                     break;
                 }
                 case IFI: {
@@ -443,6 +499,10 @@ public class CPU32 {
                     System.out.println(this.currentInstruction.getArg2ByteValue());
                     break;
                 }
+                case PRINTC: {
+                    System.out.print((char)this.currentInstruction.getArg2ByteValue());
+                    break;
+                }
                 case CALL: {
                     this.r.address(pc);                    
                     int value = this.currentInstruction.arg2Value;
@@ -462,47 +522,47 @@ public class CPU32 {
                     
                 case ADDI: {
                     int value = this.currentInstruction.getArg2IntValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.intValue() + value);                    
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getArg1IntValue() + value);                    
                     break;
                 }
                 case ADDF: {
                     float value = this.currentInstruction.getArg2FloatValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.floatValue() + value);
+                    this.currentInstruction.setArg1FloatValue(this.currentInstruction.getArg1FloatValue() + value);
                     break;
                 }
                 case ADDB: {
                     byte value = this.currentInstruction.getArg2ByteValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.byteValue() + value);
+                    this.currentInstruction.setArg1ByteValue((byte)(this.currentInstruction.getArg1ByteValue() + value));
                     break;
                 }
                 case SUBI: {
                     int value = this.currentInstruction.getArg2IntValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.intValue() - value);                    
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getArg1IntValue() - value);                    
                     break;
                 }
                 case SUBF: {
                     float value = this.currentInstruction.getArg2FloatValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.floatValue() - value);
+                    this.currentInstruction.setArg1FloatValue(this.currentInstruction.getArg1FloatValue() - value);
                     break;
                 }
                 case SUBB: {
                     byte value = this.currentInstruction.getArg2ByteValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.byteValue() - value);                    
+                    this.currentInstruction.setArg1ByteValue((byte)(this.currentInstruction.getArg1ByteValue() - value));                    
                     break;
                 }
                 case MULI: {
                     int value = this.currentInstruction.getArg2IntValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.intValue() * value);                     
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getArg1IntValue() * value);                     
                     break;
                 }
                 case MULF: {
                     float value = this.currentInstruction.getArg2FloatValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.floatValue() * value);
+                    this.currentInstruction.setArg1FloatValue(this.currentInstruction.getArg1FloatValue() * value);
                     break;
                 }
                 case MULB: {
                     byte value = this.currentInstruction.getArg2ByteValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.byteValue() * value);                     
+                    this.currentInstruction.setArg1ByteValue((byte)(this.currentInstruction.getArg1ByteValue() * value));                     
                     break;
                 }
                 case DIVI: {
@@ -511,7 +571,7 @@ public class CPU32 {
                         error("Divide be zero error.");
                     }
                     
-                    this.currentInstruction.x.value(this.currentInstruction.x.intValue() / value); 
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getArg1IntValue() / value); 
                     break;
                 }
                 case DIVF: {
@@ -519,7 +579,7 @@ public class CPU32 {
                     if(value == 0) {
                         error("Divide be zero error.");
                     }
-                    this.currentInstruction.x.value(this.currentInstruction.x.floatValue() / value);
+                    this.currentInstruction.setArg1FloatValue(this.currentInstruction.getArg1FloatValue() / value);
                     break;
                 }
                 case DIVB: {
@@ -528,7 +588,7 @@ public class CPU32 {
                         error("Divide be zero error.");
                     }
                     
-                    this.currentInstruction.x.value(this.currentInstruction.x.byteValue() / value); 
+                    this.currentInstruction.setArg1ByteValue((byte)(this.currentInstruction.getArg1ByteValue() / value)); 
                     break;
                 }
                 case MODI: {
@@ -537,7 +597,7 @@ public class CPU32 {
                         error("Divide be zero error.");
                     }
                     
-                    this.currentInstruction.x.value(this.currentInstruction.x.intValue() % value);                  
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getArg1IntValue() % value);                  
                     break;
                 }
                 case MODF: {
@@ -545,7 +605,7 @@ public class CPU32 {
                     if(value == 0) {
                         error("Divide be zero error.");
                     }
-                    this.currentInstruction.x.value(this.currentInstruction.x.floatValue() % value);
+                    this.currentInstruction.setArg1FloatValue(this.currentInstruction.getArg1FloatValue() % value);
                     break;
                 }
                 case MODB: {
@@ -554,77 +614,77 @@ public class CPU32 {
                         error("Divide be zero error.");
                     }
                     
-                    this.currentInstruction.x.value(this.currentInstruction.x.byteValue() % value); 
+                    this.currentInstruction.setArg1ByteValue((byte)(this.currentInstruction.getArg1ByteValue() % value)); 
                     break;
                 }
                 case ORI: {
                     int value = this.currentInstruction.getArg2IntValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.intValue() | value);                     
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getArg1IntValue() | value);                     
                     break;
                 }
                 case ORB: {
                     byte value = this.currentInstruction.getArg2ByteValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.byteValue() | value);                     
+                    this.currentInstruction.setArg1ByteValue((byte)(this.currentInstruction.getArg1ByteValue() | value));                     
                     break;
                 }
                 case ANDI: {
                     int value = this.currentInstruction.getArg2IntValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.intValue() & value);                     
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getArg1IntValue() & value);                     
                     break;
                 }
                 case ANDB: {
                     byte value = this.currentInstruction.getArg2ByteValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.byteValue() & value);                     
+                    this.currentInstruction.setArg1ByteValue((byte)(this.currentInstruction.getArg1ByteValue() & value));                     
                     break;
                 }
                 case NOTI: {
                     int value = this.currentInstruction.getArg2IntValue();                    
-                    this.currentInstruction.x.value(~value);                     
+                    this.currentInstruction.setArg1IntValue(~value);                     
                     break;
                 }
                 case NOTB: {
                     byte value = this.currentInstruction.getArg2ByteValue();                    
-                    this.currentInstruction.x.value(~value);                     
+                    this.currentInstruction.setArg1ByteValue((byte)(~value));                     
                     break;
                 }
                 case XORI: {
                     int value = this.currentInstruction.getArg2IntValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.intValue() ^ value);                     
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getArg1IntValue() ^ value);                     
                     break;
                 }
                 case XORB: {
                     byte value = this.currentInstruction.getArg2ByteValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.byteValue() ^ value);                     
+                    this.currentInstruction.setArg1ByteValue((byte)(this.currentInstruction.getArg1ByteValue() ^ value));                     
                     break;
                 }
                 case SZRLI: {
                     int value = this.currentInstruction.getArg2IntValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.intValue() >>> value);                     
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getArg1IntValue() >>> value);                     
                     break;
                 }
                 case SZRLB: {
                     byte value = this.currentInstruction.getArg2ByteValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.byteValue() >>> value);                     
+                    this.currentInstruction.setArg1ByteValue((byte)(this.currentInstruction.getArg1ByteValue() >>> value));                     
                     break;
                 }
                 case SRLI: {
                     int value = this.currentInstruction.getArg2IntValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.intValue() >> value);                     
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getArg1IntValue() >> value);                     
                     break;
                 }
                 case SRLB: {
                     byte value = this.currentInstruction.getArg2ByteValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.byteValue() >> value);                     
+                    this.currentInstruction.setArg1ByteValue((byte)(this.currentInstruction.getArg1ByteValue() >> value));                     
                     break;
                 }
                 case SLLI: {
                     int value = this.currentInstruction.getArg2IntValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.intValue() << value);                     
+                    this.currentInstruction.setArg1IntValue(this.currentInstruction.getArg1IntValue() << value);                     
                     break;
                 }
                 case SLLB: {
                     byte value = this.currentInstruction.getArg2ByteValue();                    
-                    this.currentInstruction.x.value(this.currentInstruction.x.byteValue() << value);                     
+                    this.currentInstruction.setArg1ByteValue((byte)(this.currentInstruction.getArg1ByteValue() << value));                     
                     break;
                 }
                 default:

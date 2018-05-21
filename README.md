@@ -26,11 +26,11 @@ Remaining Instructions Format
 ==
 For all other instructions, they use the remaining 24 bits for two arguments.  The first argument takes 5 bits, were the first bit designates if the value in 
 the register should be treated as an `address` or `value`.  The remaining 4 bits identify which register.  Although, the format supports up to 16 registers, the CPU 
-only has 10 registers.
+only has 12 registers.
   
 The second argument takes 21 bits.  The first bit designates if the argument is a register.  If its set to `1`, then the second bit designates if the value in
 the register should be treated as an `address` or `value`.  The remaining 19 bits identify which register.  Although, the format supports up to `2^19` registers, the CPU
-only has 10 registers.  
+only has 12 registers.  
 
 If the first bit is `0`,  then the second bit designates if the value should be treated either as
 an immediate value (second bit = 1) or a constant index lookup (second bit = 0).  In the immediate value case, the immediate value is an unsigned value with a max value of
@@ -47,7 +47,7 @@ Instruction Format Table
 
 Registers
 ==
-There are 10 total registers, four reserved and six general purpose.  Registers can contain a 32 bit value (either int or float); use the appropriate `opcode` to interpret the value of the register correctly (`opcodes` come in three flavors `I`, `F`, `B` to parse 32 bit int, 32 bit float and 8 bit bytes respectively.  Additionally, a register can contain a memory address, as all memory addresses are 32 bit.
+There are 12 total registers, four reserved and six general purpose.  Registers can contain a 32 bit value (either int or float); use the appropriate `opcode` to interpret the value of the register correctly (`opcodes` come in three flavors `I`, `F`, `B` to parse 32 bit int, 32 bit float and 8 bit bytes respectively.  Additionally, a register can contain a memory address, as all memory addresses are 32 bit.
 
 * `$sp` is the stack pointer and is available for read/write
 * `$pc` is the program counter and is available for read
@@ -56,9 +56,11 @@ There are 10 total registers, four reserved and six general purpose.  Registers 
 * `$a` is a general purpose register for read/write
 * `$b` is a general purpose register for read/write
 * `$c` is a general purpose register for read/write
+* `$d` is a general purpose register for read/write
 * `$i` is a general purpose register for read/write
 * `$j` is a general purpose register for read/write
 * `$k` is a general purpose register for read/write
+* `$u` is a general purpose register for read/write
 
 RAM
 ==
@@ -85,24 +87,28 @@ There are a number of `opcodes` the CPU can handle.
 | LDCF         | 5     | $a $b     | Loads 32 bit float constant $a = $b |
 | LDCB         | 6     | $a $b     | Loads 8 bit byte constant $a = $b |
 | LDCA         | 7     | $a $b     | Loads 32 bit int constant address $a = $b |
-| PUSHI        | 8     | $b        | Push 32 bit int on top of stack (increments $sp by 4) |
-| PUSHF        | 9     | $b        | Push 32 bit float on top of stack (increments $sp by 4) |
-| PUSHB        | 10    | $b        | Push 8 bit byte on top of stack (increments $sp by 1) |
-| POPI         | 11    | $a        | Pops 32 bit int from top of stack (decrements $sp by 4) |
-| POPF         | 12    | $a        | Pops 32 bit float from top of stack (decrements $sp by 4) |
-| POPB         | 13    | $a        | Pops 8 bit byte from top of stack (decrements $sp by 1) |
-| IFI          | 14    | $a $b     | Skips the next instruction if $a > $b |
-| IFF          | 15    | $a $b     | Skips the next instruction if $a > $b |
-| IFB          | 16    | $a $b     | Skips the next instruction if $a > $b |
-| IFEI         | 17    | $a $b     | Skips the next instruction if $a >= $b |
-| IFEF         | 18    | $a $b     | Skips the next instruction if $a >= $b |
-| IFEB         | 19    | $a $b     | Skips the next instruction if $a >= $b |
-| JMP          | 20    | $v        | Moves the program counter to position $v |
-| PRINTI       | 21    | $a        | Prints the value of $a to system out |
-| PRINTF       | 22    | $a        | Prints the value of $a to system out |
-| PRINTB       | 23    | $a        | Prints the value of $a to system out |
-| CALL         | 24    | $v        | Stores the current program counter in register `$r` and sets the program counter to $v |
-| RET          | 25    | 0         | Sets the program counter to the value stored in register `$r` |
+| PUSHI        | 8     | $b        | Push 32 bit int on top of stack (decrements $sp by 4) |
+| PUSHF        | 9     | $b        | Push 32 bit float on top of stack (decrements $sp by 4) |
+| PUSHB        | 10    | $b        | Push 8 bit byte on top of stack (decrements $sp by 1) |
+| POPI         | 11    | $a        | Pops 32 bit int from top of stack (increments $sp by 4) |
+| POPF         | 12    | $a        | Pops 32 bit float from top of stack (increments $sp by 4) |
+| POPB         | 13    | $a        | Pops 8 bit byte from top of stack (increments $sp by 1) |
+| DUPI         | 14    | $a        | Duplicates a 32 bit int on top of the stack (decrements $sp by 4) and places the copied value in $a |
+| DUPF         | 15    | $a        | Duplicates a 32 bit float on top of the stack (decrements $sp by 4) and places the copied value in $a |
+| DUPB         | 16    | $a        | Duplicates a 8 bit byte on top of the stack (decrements $sp by 1) and places the copied value in $a |
+| IFI          | 17    | $a $b     | Skips the next instruction if $a > $b |
+| IFF          | 18    | $a $b     | Skips the next instruction if $a > $b |
+| IFB          | 19    | $a $b     | Skips the next instruction if $a > $b |
+| IFEI         | 20    | $a $b     | Skips the next instruction if $a >= $b |
+| IFEF         | 21    | $a $b     | Skips the next instruction if $a >= $b |
+| IFEB         | 22    | $a $b     | Skips the next instruction if $a >= $b |
+| JMP          | 23    | $v        | Moves the program counter to position $v |
+| PRINTI       | 24    | $a        | Prints the value of $a to system out |
+| PRINTF       | 25    | $a        | Prints the value of $a to system out |
+| PRINTB       | 26    | $a        | Prints the value of $a to system out |
+| PRINTC       | 27    | $a        | Prints the value of $a (as an ASCII character) to system out |
+| CALL         | 28    | $v        | Stores the current program counter in register `$r` and sets the program counter to $v |
+| RET          | 29    | 0         | Sets the program counter to the value stored in register `$r` |
 | ADDI         | 30    | $a $b     | Adds two 32 bit int and stores the result in $a = $a + $b |
 | ADDF         | 31    | $a $b     | Adds two 32 bit float and stores the result in $a = $a + $b |
 | ADDB         | 32    | $a $b     | Adds two 8 bit byte and stores the result in $a = $a + $b |
@@ -182,12 +188,11 @@ printi #11           ; shouldn't get invoked!
         ifb &$a #0     ;; loops until the value at address $a = 0; strings are null terminated
         jmp :print_end_loop
         
-        printb &$a     ;; prints out the ASCII byte character
-        addi $a #1     ;; increments to the next character byte
-        jmp :print_loop
+       printb &$a     ;; prints out the ASCII byte character
+       addi $a #1     ;; increments to the next character byte
+       jmp :print_loop
     :print_end_loop    
-        ret             ;; Stores return $pc in $r register, RET sets the $pc to value of $r
-
-
+       ret             ;; Stores return $pc in $r register, RET sets the $pc to value of $r
+       
 :exit
 ```

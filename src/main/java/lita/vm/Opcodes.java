@@ -40,71 +40,76 @@ public class Opcodes {
         LDCA        = 7,   // Loads the address of the constant into a register LDCA $a
         
         PUSHI       = 8,   // PUSH's the register value onto the stack PUSHI $a
-        PUSHF       = 9,  // PUSH's the register value onto the stack PUSHF $a
+        PUSHF       = 9,   // PUSH's the register value onto the stack PUSHF $a
         PUSHB       = 10,  // PUSH's the register value onto the stack PUSHB $a
         
         POPI        = 11,  // POP's the top of the stack into the register POPI $a
         POPF        = 12,  // POP's the top of the stack into the register POPF $a
         POPB        = 13,  // POP's the top of the stack into the register POPB $a
         
-        IFI         = 14,  // If (integer) $a > $b skips the next instruction; IFI $a $b
-        IFF         = 15,  // If (float)   $a > $b skips the next instruction; IFF $a $b
-        IFB         = 16,  // If (byte)    $a > $b skips the next instruction; IFB $a $b
+        DUPI        = 14,  // Duplicates the top of the stack, stores the top in register $a
+        DUPF        = 15,  // Duplicates the top of the stack, stores the top in register $a
+        DUPB        = 16,  // Duplicates the top of the stack, stores the top in register $a
         
-        IFEI        = 17,  // If (integer) $a >= $b skips the next instruction; IFEI $a $b
-        IFEF        = 18,  // If (float)   $a >= $b skips the next instruction; IFEF $a $b
-        IFEB        = 19,  // If (byte)    $a >= $b skips the next instruction; IFEB $a $b
+        IFI         = 17,  // If (integer) $a > $b skips the next instruction; IFI $a $b
+        IFF         = 18,  // If (float)   $a > $b skips the next instruction; IFF $a $b
+        IFB         = 19,  // If (byte)    $a > $b skips the next instruction; IFB $a $b
         
-        JMP         = 20,  // Jumps the amount of $b
+        IFEI        = 20,  // If (integer) $a >= $b skips the next instruction; IFEI $a $b
+        IFEF        = 21,  // If (float)   $a >= $b skips the next instruction; IFEF $a $b
+        IFEB        = 22,  // If (byte)    $a >= $b skips the next instruction; IFEB $a $b
         
-        PRINTI      = 21,  // Prints registers
-        PRINTF      = 22,  // Prints registers
-        PRINTB      = 23,  // Prints the byte at the supplied address
+        JMP         = 23,  // Jumps the amount of $b
         
-        CALL        = 24,  // CALL $b  pushes the address on the next instruction onto the stack
-        RET         = 25,  // stores return value in $x registers and moves the PC to the the value on the top of the stack 
+        PRINTI      = 24,  // Prints registers
+        PRINTF      = 25,  // Prints registers
+        PRINTB      = 26,  // Prints the byte at the supplied address
+        PRINTC      = 27,  // Prints the byte (as a character) at the supplied address
+        
+        CALL        = 28,  // CALL $b  pushes the address on the next instruction onto the stack
+        RET         = 29,  // stores return value in $x registers and moves the PC to the the value on the top of the stack 
         
         
-        ADDI        = 30,   // Adds two integers ADDI $a $b => $a = $a + $b
-        ADDF        = 31,   // Adds two floats ADDF $a $b => $a = $a + $b
-        ADDB        = 32,   // Adds two bytes ADDB $a $b => $a = $a + $b
+        ADDI        = 30,  // Adds two integers ADDI $a $b => $a = $a + $b
+        ADDF        = 31,  // Adds two floats ADDF $a $b => $a = $a + $b
+        ADDB        = 32,  // Adds two bytes ADDB $a $b => $a = $a + $b
         
-        SUBI        = 33,   // Subtracts two integers SUBI $a $b => $a = $a - $b
-        SUBF        = 34,   // Subtracts two floats SUBF $a $b => $a = $a - $b
-        SUBB        = 35,   // Subtracts two bytes SUBB $a $b => $a = $a - $b
+        SUBI        = 33,  // Subtracts two integers SUBI $a $b => $a = $a - $b
+        SUBF        = 34,  // Subtracts two floats SUBF $a $b => $a = $a - $b
+        SUBB        = 35,  // Subtracts two bytes SUBB $a $b => $a = $a - $b
         
-        MULI        = 36,   // Multiplies two integers MULI $a $b => $a = $a * $b
-        MULF        = 37,   // Multiplies two floats MULF $a $b => $a = $a * $b
-        MULB        = 38,   // Multiplies two bytes MULB $a $b => $a = $a * $b
+        MULI        = 36,  // Multiplies two integers MULI $a $b => $a = $a * $b
+        MULF        = 37,  // Multiplies two floats MULF $a $b => $a = $a * $b
+        MULB        = 38,  // Multiplies two bytes MULB $a $b => $a = $a * $b
         
-        DIVI        = 39,   // Divides two integers DIVI $a $b => $a = $a / $b
-        DIVF        = 40,   // Divides two floats DIVF $a $b => $a = $a / $b
-        DIVB        = 41,   // Divides two bytes DIVB $a $b => $a = $a / $b
+        DIVI        = 39,  // Divides two integers DIVI $a $b => $a = $a / $b
+        DIVF        = 40,  // Divides two floats DIVF $a $b => $a = $a / $b
+        DIVB        = 41,  // Divides two bytes DIVB $a $b => $a = $a / $b
         
-        MODI        = 42,   // Remainder of two integers MODI $a $b => $a = $a % $b
-        MODF        = 43,   // Remainder of two floats MODI $a $b => $a = $a % $b
-        MODB        = 44,   // Remainder of two bytes MODI $a $b => $a = $a % $b
+        MODI        = 42,  // Remainder of two integers MODI $a $b => $a = $a % $b
+        MODF        = 43,  // Remainder of two floats MODI $a $b => $a = $a % $b
+        MODB        = 44,  // Remainder of two bytes MODI $a $b => $a = $a % $b
         
-        ORI         = 45,   // Bitwise OR of two integers ORI $a $b => $a = $a | $b
-        ORB         = 46,   // Bitwise OR of two bytes ORB $a $b => $a = $a | $b
+        ORI         = 45,  // Bitwise OR of two integers ORI $a $b => $a = $a | $b
+        ORB         = 46,  // Bitwise OR of two bytes ORB $a $b => $a = $a | $b
         
-        ANDI        = 47,   // Bitwise AND of two integers ANDI $a $b => $a = $a & $b
-        ANDB        = 48,   // Bitwise AND of two bytes ANDB $a $b => $a = $a & $b
+        ANDI        = 47,  // Bitwise AND of two integers ANDI $a $b => $a = $a & $b
+        ANDB        = 48,  // Bitwise AND of two bytes ANDB $a $b => $a = $a & $b
         
-        NOTI        = 49,   // Bitwise NOT of the integer NOTI $a $b => $a = ~$b
-        NOTB        = 50,   // Bitwise NOT of the byte NOTB $a $b => $a = ~$b
+        NOTI        = 49,  // Bitwise NOT of the integer NOTI $a $b => $a = ~$b
+        NOTB        = 50,  // Bitwise NOT of the byte NOTB $a $b => $a = ~$b
         
-        XORI        = 51,   // Bitwise exclusive OR of the integers XORI $a $b => $a = $a ^ $b
-        XORB        = 52,   // Bitwise exclusive OR of the bytes XORI $a $b => $a = $a ^ $b
+        XORI        = 51,  // Bitwise exclusive OR of the integers XORI $a $b => $a = $a ^ $b
+        XORB        = 52,  // Bitwise exclusive OR of the bytes XORI $a $b => $a = $a ^ $b
         
-        SZRLI        = 53,  // Bitwise shift zero right logical operator for integer SZRLI $a $b => $a >>> $b
-        SZRLB        = 54,  // Bitwise shift zero right logical operator for byte SZRLB $a $b => $a >>> $b
+        SZRLI       = 53,  // Bitwise shift zero right logical operator for integer SZRLI $a $b => $a >>> $b
+        SZRLB       = 54,  // Bitwise shift zero right logical operator for byte SZRLB $a $b => $a >>> $b
         
-        SRLI         = 55,  // Bitwise shift right logical operator for integer SRLI $a $b => $a >> $b
-        SRLB         = 56,  // Bitwise shift right logical operator for byte SRLB $a $b => $a >> $b
+        SRLI        = 55,  // Bitwise shift right logical operator for integer SRLI $a $b => $a >> $b
+        SRLB        = 56,  // Bitwise shift right logical operator for byte SRLB $a $b => $a >> $b
         
-        SLLI         = 57,  // Bitwise shift left logical operator for integer SLLI $a $b => $a << $b
-        SLLB         = 58   // Bitwise shift left logical operator for byte SLLB $a $b => $a << $b
+        SLLI        = 57,  // Bitwise shift left logical operator for integer SLLI $a $b => $a << $b
+        SLLB        = 58   // Bitwise shift left logical operator for byte SLLB $a $b => $a << $b
         ;
     
     private static final Opcode[] opcodesStr = new Opcode[64];
@@ -128,6 +133,10 @@ public class Opcodes {
         opcodesStr[POPF] = new Opcode("POPF", 1);
         opcodesStr[POPB] = new Opcode("POPB", 1);
         
+        opcodesStr[DUPI] = new Opcode("DUPI", 1);
+        opcodesStr[DUPF] = new Opcode("DUPF", 1);
+        opcodesStr[DUPB] = new Opcode("DUPB", 1);
+        
         opcodesStr[IFI] = new Opcode("IFI", 2);
         opcodesStr[IFF] = new Opcode("IFF", 2);
         opcodesStr[IFB] = new Opcode("IFB", 2);
@@ -141,6 +150,7 @@ public class Opcodes {
         opcodesStr[PRINTI] = new Opcode("PRINTI", 1);
         opcodesStr[PRINTF] = new Opcode("PRINTF", 1);
         opcodesStr[PRINTB] = new Opcode("PRINTB", 1);
+        opcodesStr[PRINTC] = new Opcode("PRINTC", 1);
         
         opcodesStr[CALL] = new Opcode("CALL", 1);
         opcodesStr[RET]  = new Opcode("RET", 0);

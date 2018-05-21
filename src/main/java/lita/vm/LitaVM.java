@@ -64,11 +64,8 @@ public class LitaVM {
             
             Assembler asm = new Assembler(vm);
             try {
-                long s = System.nanoTime();
                 Bytecode bytecode = asm.compile(new String(Files.readAllBytes(inputFile.toPath()), "UTF8"));
-                
                 vm.execute(bytecode);
-                System.out.println("Time: " + (System.nanoTime() - s));
             }
             catch(ParserException e) {
                 System.err.println("Parsing Error >> " + e.getMessage());
