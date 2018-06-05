@@ -1,6 +1,6 @@
 LitaVM
 ==
-LitaVM is a 32 bit CPU Virtual Machine, created because who doesn't like understanding how low level hardware works?  The name `lita` comes from my grandma who I love dearly.
+LitaVM is a 32 bit CPU Virtual Machine, created because who doesn't like understanding how low level programming and hardware works?  The name `lita` comes from my grandma who I love dearly.
 
 The main goals of this project is to create a CPU with a set of instructions to manipulate memory and create an assembly language to program the fancy CPU.  If I feel adventurous enough, I may create a C like language for it as well.
 
@@ -149,7 +149,9 @@ The LitaVM assembly language syntax is pretty standard.
 | .favre 4            | Creates a constant named `favre` that can be referenced in instruction arguments, when it is referenced, the number 4 is used|
 | .brett "Brett"      | Creates a constant named `brett` that can be referenced in instruction arguments, when it is referenced, the memory address of the start of the `"Brett"` string is used |
 | pushi .favre        | This will use the constant `4` and push that onto the stack |
-| pushi #12           | This will use the immediate value of `12` and push that onto the stack. Only integers are allowed in immediate values |
+| pushi #12           | This will use the immediate value of `12`(format in base 10) and push that onto the stack. Only integers are allowed in immediate values |
+| pushi #0x01         | This will use the immediate value of `1` (format in hexidecimal) and push that onto the stack. Only integers are allowed in immediate values |
+| pushi #0b1001       | This will use the immediate value of `9` (format in binary) and push that onto the stack. Only integers are allowed in immediate values |
 | ; this is a comment | Creates a comment, anything after the `;` is ignored |
 | :label              | Creates a label that a `jmp` or `call` instruction can jump to.  |
 | jmp :label          | Moves the program counter to the location of `:label` |
@@ -160,7 +162,7 @@ The LitaVM assembly language syntax is pretty standard.
 Sample Assembly
 ==
 
-Prints out each ASCII value of a the string
+Hello World program, which prints out "Hello World" to system out
 ```asm
 
 ;; Create a constant
@@ -172,10 +174,10 @@ pushi $a             ;; push the address on the stack, so that print_string can 
 call :print_string   ;; call the print_string subroutine
 
 jmp :exit            ; exit out of the program
-printi #11           ; shouldn't get invoked!
+printi #11           ; shouldn't get invoked, because we are jumping to the :exit label
 
 ;;
-;; Prints the ASCII values of the string
+;; Prints the supplied string to sysout
 ;;
 ;; input:
 ;;    <address> to string constant, retreived from top of the stack
@@ -183,16 +185,15 @@ printi #11           ; shouldn't get invoked!
 ;;    <void>
 ;;
 :print_string        
-        popi $a        ;; stores the address of the string constant
+        popi $a          ;; stores the address of the string constant
     :print_loop
-        ifb &$a #0     ;; loops until the value at address $a = 0; strings are null terminated
+        ifb &$a #0       ;; loops until the value at address $a = 0; strings are null terminated
         jmp :print_end_loop
-        
-       printb &$a     ;; prints out the ASCII byte character
-       addi $a #1     ;; increments to the next character byte
-       jmp :print_loop
+        printc &$a       ;; prints out the ASCII byte character
+        addi $a #1       ;; increments to the next character byte
+        jmp :print_loop
     :print_end_loop    
-       ret             ;; Stores return $pc in $r register, RET sets the $pc to value of $r
+        ret              ;; Stores return $pc in $r register, RET sets the $pc to value of $r
        
 :exit
 ```

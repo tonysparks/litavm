@@ -140,12 +140,24 @@ public class AssemblerParser {
             }
 
             if(arg2.startsWith("#")) {
-                if(arg2.length() < 2) {
+                int base = 10;
+                int offset = 1;
+                
+                if(arg2.startsWith("#0x")) {
+                    base = 16;  // Hexidecimal format
+                    offset = 3;
+                }
+                else if(arg2.startsWith("#0b")) {
+                    base = 2;  // Binary format
+                    offset = 3;
+                }
+                
+                if(arg2.length() < (offset+1)) {
                     throw parseError(instr, "Invalid immediate value argument structure: '" + arg2 + "'");    
                 }
                 
-                arg2 = arg2.substring(1);
-                int value = Integer.parseInt(arg2);
+                arg2 = arg2.substring(offset);
+                int value = Integer.parseInt(arg2, base);
                 if(value > Instruction.MAX_IMMEDIATE_VALUE) {
                     throw parseError(instr, "Invalid immediate value, above max value (" + Instruction.MAX_IMMEDIATE_VALUE + "): '" + value + "'");
                 }
